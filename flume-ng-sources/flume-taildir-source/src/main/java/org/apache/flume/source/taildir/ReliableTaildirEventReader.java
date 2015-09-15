@@ -256,11 +256,12 @@ public class ReliableTaildirEventReader implements ReliableEventReader {
             if (tf.getRaf() == null) {
               tf = openFile(f, headers, inode, tf.getPos());
             }
-            if (f.length() < tf.getPos()) {
-              logger.info("Pos " + tf.getPos() + " is larger than file size! "
-                  + "Restarting from pos 0, file: " + tf.getPath() + ", inode: " + inode);
-              tf.updatePos(tf.getPath(), inode, 0);
-            }
+//            if (f.length() < tf.getPos()) {
+//              logger.info("Pos " + tf.getPos() + " is larger than file size! "
+//                  + "Restarting from pos 0, file: " + tf.getPath() + ", inode: " + inode);
+//              tf.updatePos(tf.getPath(), inode, 0);
+//            }
+            tf.updatePos(tf.getPath(), inode, tf.getPos());
           }
           tf.setNeedTail(updated);
         }

@@ -436,7 +436,7 @@ public class TestTaildirEventReader {
 
     reader.updateTailFiles();
     for (TailFile tf : reader.getTailFiles().values()) {
-      if (tf.getPath().equals(tmpDir + "file1")) {
+      if (tf.getPath().equals(tmpDir + "/file1")) {
         assertEquals(0, tf.getPos());
       }
     }
@@ -446,7 +446,7 @@ public class TestTaildirEventReader {
     // Expect to skip to EOF the read position when skipToEnd option is true
     reader.updateTailFiles(true);
     for (TailFile tf : reader.getTailFiles().values()) {
-      if (tf.getPath().equals(tmpDir + "file2")) {
+      if (tf.getPath().equals(tmpDir + "/file2")) {
         assertEquals(f2.length(), tf.getPos());
       }
     }
