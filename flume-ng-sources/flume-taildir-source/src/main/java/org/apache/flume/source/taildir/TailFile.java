@@ -65,37 +65,74 @@ public class TailFile {
     this.headers = headers;
   }
 
-  public RandomAccessFile getRaf() { return raf; }
-  public String getPath() { return path; }
-  public long getInode() { return inode; }
-  public long getPos() { return pos; }
-  public long getLastUpdated() { return lastUpdated; }
-  public boolean needTail() { return needTail; }
-  public Map<String, String> getHeaders() { return headers; }
+  public RandomAccessFile getRaf() {
+    return raf;
+  }
 
-  public void setPos(long pos) { this.pos = pos; }
-  public void setLastUpdated(long lastUpdated) { this.lastUpdated = lastUpdated; }
-  public void setNeedTail(boolean needTail) { this.needTail = needTail; }
+  public String getPath() {
+    return path;
+  }
+
+  public long getInode() {
+    return inode;
+  }
+
+  public long getPos() {
+    return pos;
+  }
+
+  public long getLastUpdated() {
+    return lastUpdated;
+  }
+
+  public boolean needTail() {
+    return needTail;
+  }
+
+  public Map<String, String> getHeaders() {
+    return headers;
+  }
+
+  public void setPos(long pos) {
+    this.pos = pos;
+  }
+
+  public void setLastUpdated(long lastUpdated) {
+    this.lastUpdated = lastUpdated;
+  }
+
+  public void setNeedTail(boolean needTail) {
+    this.needTail = needTail;
+  }
 
   public boolean updatePos(String path, long inode, long pos) throws IOException {
+    long newPos = pos;
+    if (raf.length() < pos) {
+      logger.info("Pos " + pos + " is larger than file size! "
+          + "Restarting from pos 0, file: " + path + ", inode: " + inode);
+      newPos = 0;
+    }
+
     if (this.inode == inode && this.path.equals(path)) {
-      raf.seek(pos);
-      setPos(pos);
-      logger.info("Updated position, file: " + path + ", inode: " + inode + ", pos: " + pos);
+      raf.seek(newPos);
+      setPos(newPos);
+      logger.info("Updated position, file: " + path + ", inode: " + inode + ", pos: " + newPos);
       return true;
     }
     return false;
   }
 
   public List<Event> readEvents(int numEvents, boolean backoffWithoutNL,
-      boolean addByteOffset) throws IOException {
+                                boolean addByteOffset) throws IOException {
     List<Event> events = Lists.newLinkedList();
-    for (int i = 0; i < numEvents; i++) {
-      Event event = readEvent(backoffWithoutNL, addByteOffset);
-      if (event == null) {
-        break;
+    if (needTail) {
+      for (int i = 0; i < numEvents; i++) {
+        Event event = readEvent(backoffWithoutNL, addByteOffset);
+        if (event == null) {
+          break;
+        }
+        events.add(event);
       }
-      events.add(event);
     }
     return events;
   }
@@ -114,7 +151,7 @@ public class TailFile {
     }
 
     String lineSep = LINE_SEP;
-    if(line.endsWith(LINE_SEP_WIN)) {
+    if (line.endsWith(LINE_SEP_WIN)) {
       lineSep = LINE_SEP_WIN;
     }
     Event event = EventBuilder.withBody(StringUtils.removeEnd(line, lineSep), Charsets.UTF_8);

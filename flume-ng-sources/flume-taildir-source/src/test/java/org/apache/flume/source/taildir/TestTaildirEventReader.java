@@ -230,9 +230,12 @@ public class TestTaildirEventReader {
   // Test a case where a commit is missed and the batch size changes.
   public void testBasicCommitFailureAndBatchSizeChanges() throws IOException {
     File f1 = new File(tmpDir, "file1");
+//    Files.write("file1line1\nfile1line2\nfile1line3\nfile1line4\n" +
+//                "file1line5\nfile1line6\nfile1line7\nfile1line8\n",
+//                f1, Charsets.UTF_8);
     Files.write("file1line1\nfile1line2\nfile1line3\nfile1line4\n" +
-                "file1line5\nfile1line6\nfile1line7\nfile1line8\n",
-                f1, Charsets.UTF_8);
+            "file1line5\nfile1line6\nfile1line7\nfile1line8",
+        f1, Charsets.UTF_8);
 
     ReliableTaildirEventReader reader = getReader();
     List<String> out1 = null;
@@ -259,7 +262,8 @@ public class TestTaildirEventReader {
     assertTrue(out4.contains("file1line5"));
     assertTrue(out4.contains("file1line6"));
     assertTrue(out4.contains("file1line7"));
-    assertTrue(out4.contains("file1line8"));
+//    assertTrue(out4.contains("file1line8"));
+    assertFalse(out4.contains("file1line8"));
   }
 
   @Test
@@ -415,7 +419,7 @@ public class TestTaildirEventReader {
     reader.loadPositionFile(posFilePath);
 
     for (TailFile tf : tailFiles.values()) {
-      if (tf.getPath().equals(tmpDir + "file3")) {
+      if (tf.getPath().equals(tmpDir + "/file3")) {
         // when given position is larger than file size
         assertEquals(0, tf.getPos());
       } else {

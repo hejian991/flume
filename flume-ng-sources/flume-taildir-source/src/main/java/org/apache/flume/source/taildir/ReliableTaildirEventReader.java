@@ -76,7 +76,7 @@ public class ReliableTaildirEventReader implements ReliableEventReader {
 
     if (logger.isDebugEnabled()) {
       logger.debug("Initializing {} with directory={}, metaDir={}",
-          new Object[] { ReliableTaildirEventReader.class.getSimpleName(), filePaths });
+          new Object[] { ReliableTaildirEventReader.class.getSimpleName(), filePaths, positionFilePath });
     }
 
     Table<String, File, Pattern> tailFileTable = HashBasedTable.create();
@@ -142,6 +142,7 @@ public class ReliableTaildirEventReader implements ReliableEventReader {
           tailFiles.put(inode, tf);
         } else {
           logger.info("Missing file: " + path + ", inode: " + inode + ", pos: " + pos);
+          // TODO 删减 meta 文件的内容，或定时清理5天或7天前的 meta 元素信息
         }
       }
       jr.endArray();
@@ -178,7 +179,7 @@ public class ReliableTaildirEventReader implements ReliableEventReader {
 
   @Override
   public List<Event> readEvents(int numEvents) throws IOException {
-    return readEvents(numEvents, false);
+    return readEvents(numEvents, true);
   }
 
   @VisibleForTesting
