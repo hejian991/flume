@@ -267,7 +267,10 @@ public class TestTaildirSource {
     txn.commit();
     txn.close();
 
-    System.out.println(consumedOrder);
+    for(String s : consumedOrder) {
+      System.out.println(s);
+    }
+
 
     // 6) Ensure consumption order is in order of last update time
     ArrayList<String> expected = Lists.newArrayList(line1, line2, line3,    // file1
@@ -275,6 +278,7 @@ public class TestTaildirSource {
                                                     line1d, line2d, line3d, // file4
                                                     line1c, line2c, line3c  // file3
                                                      );
+    // 只是做了 .trim() 而已
     for(int i =0; i!=expected.size(); ++i) {
       expected.set(i, expected.get(i).trim() );
     }

@@ -316,6 +316,20 @@ public class TestTaildirEventReader {
     reader.commit();
     assertEquals(4, out.size());
     assertTrue(out.contains("file1line4"));
+
+    // idle file can be close, if then addend new log, can read again
+    // 忽略这种case，1、每条日志应该带有\n 2、即使不带，认为close后不再被打开 3、即使发生，影响：多一个空行
+//    Files.append("  \t\nfile1line5\n", f1, Charsets.UTF_8);
+//    out.addAll(bodiesAsStrings(reader.readEvents(5)));
+//    reader.commit();
+//    assertEquals(5, out.size());
+//    assertTrue(out.contains("file1line5"));
+//
+//    // is byteOffset right
+//    Files.append("file1line6\n", f1, Charsets.UTF_8);
+//    assertEquals("file1line6", bodiesAsStrings(reader.readEvents(5)).get(0));
+//    reader.commit();
+
   }
 
   @Test

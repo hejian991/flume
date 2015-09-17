@@ -76,6 +76,7 @@ public class TaildirSource extends AbstractSource implements
   private int writePosInitDelay = 5000;
   private int writePosInterval;
 
+  // 必须用list，因为要保证 文件消费顺序
   private List<Long> existingInodes = new CopyOnWriteArrayList<Long>();
   private List<Long> idleInodes = new CopyOnWriteArrayList<Long>();
   private Long backoffSleepIncrement;
@@ -204,7 +205,8 @@ public class TaildirSource extends AbstractSource implements
           tailFileProcess(tf, true);
         }
       }
-      closeTailFiles();
+      // closeIdleFiles意义：只是关闭 randomaccessfile文件流，并不删除tailFiles里的kv对。
+      closeIdleFiles();
       try {
         TimeUnit.MILLISECONDS.sleep(retryInterval);
       } catch (InterruptedException e) {
@@ -257,7 +259,7 @@ public class TaildirSource extends AbstractSource implements
     }
   }
 
-  private void closeTailFiles() throws IOException, InterruptedException {
+  private void closeIdleFiles() throws IOException, InterruptedException {
     for (long inode : idleInodes) {
       TailFile tf = reader.getTailFiles().get(inode);
       if (tf.getRaf() != null) { // when file has not closed yet
@@ -276,6 +278,7 @@ public class TaildirSource extends AbstractSource implements
     @Override
     public void run() {
       try {
+        idleInodes.clear();
         long now = System.currentTimeMillis();
         for (TailFile tf : reader.getTailFiles().values()) {
           if (tf.getLastUpdated() + idleTimeout < now && tf.getRaf() != null) {
@@ -319,6 +322,10 @@ public class TaildirSource extends AbstractSource implements
     }
   }
 
+  // 每次把 existingInodes 存在的文件 的进度 覆盖写到 posFile中，这种做法不合理
+  // 应该 记录 所有文件的进度。
+  // 进一步查看发现，existingInodes.addAll(reader.updateTailFiles());就是 存在的所有文件
+  // 因此这个做法没问题。
   private String toPosInfoJson() {
     @SuppressWarnings("rawtypes")
     List<Map> posInfos = Lists.newArrayList();

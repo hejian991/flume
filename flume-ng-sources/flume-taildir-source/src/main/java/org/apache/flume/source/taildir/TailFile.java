@@ -49,7 +49,7 @@ public class TailFile {
   private final String path;
   private final long inode;
   private long pos;
-  private long lastUpdated;
+  private long lastUpdated; //明确定义： 上次本应用处理的时间，包括clone操作
   private boolean needTail;
   private final Map<String, String> headers;
 
@@ -143,6 +143,10 @@ public class TailFile {
     if (line == null) {
       return null;
     }
+//    while (emptyLinePattern.matcher(line).matches()) {
+//      logger.info("occur one empty line, so slip it and go on readLine.");
+//      line = readLine();
+//    }
     if (backoffWithoutNL && !line.endsWith(LINE_SEP)) {
       logger.info("Backing off in file without newline: "
           + path + ", inode: " + inode + ", pos: " + raf.getFilePointer());
@@ -183,7 +187,7 @@ public class TailFile {
       raf.close();
       raf = null;
       long now = System.currentTimeMillis();
-      setLastUpdated(now);
+      setLastUpdated(now); //重新创建tf对象时，会init lastUpdated=0
     } catch (IOException e) {
       logger.error("Failed closing file: " + path + ", inode: " + inode, e);
     }

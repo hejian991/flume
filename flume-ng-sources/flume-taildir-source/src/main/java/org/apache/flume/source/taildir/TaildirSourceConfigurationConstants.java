@@ -17,6 +17,8 @@
 
 package org.apache.flume.source.taildir;
 
+import java.util.regex.Pattern;
+
 public class TaildirSourceConfigurationConstants {
   /** Mapping for tailing file groups. */
   public static final String FILE_GROUPS = "filegroups";
@@ -49,4 +51,7 @@ public class TaildirSourceConfigurationConstants {
   public static final String BYTE_OFFSET_HEADER = "byteOffsetHeader";
   public static final String BYTE_OFFSET_HEADER_KEY = "byteoffset";
   public static final boolean DEFAULT_BYTE_OFFSET_HEADER = false;
+
+  /** public static final */
+  public static final Pattern emptyLinePattern = Pattern.compile("\\s+");
 }

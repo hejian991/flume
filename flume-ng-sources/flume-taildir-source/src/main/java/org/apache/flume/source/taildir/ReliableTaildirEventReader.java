@@ -143,6 +143,7 @@ public class ReliableTaildirEventReader implements ReliableEventReader {
         } else {
           logger.info("Missing file: " + path + ", inode: " + inode + ", pos: " + pos);
           // TODO 删减 meta 文件的内容，或定时清理5天或7天前的 meta 元素信息
+          // 只会影响 load效率，暂时不做，依赖清理物理文件 达到清理 pos 信息的目标
         }
       }
       jr.endArray();
