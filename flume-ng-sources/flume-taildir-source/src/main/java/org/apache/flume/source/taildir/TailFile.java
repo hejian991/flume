@@ -123,11 +123,11 @@ public class TailFile {
   }
 
   public List<Event> readEvents(int numEvents, boolean backoffWithoutNL,
-                                boolean addByteOffset) throws IOException {
+                                boolean addByteOffset, boolean addInode) throws IOException {
     List<Event> events = Lists.newLinkedList();
     if (needTail) {
       for (int i = 0; i < numEvents; i++) {
-        Event event = readEvent(backoffWithoutNL, addByteOffset);
+        Event event = readEvent(backoffWithoutNL, addByteOffset, addInode);
         if (event == null) {
           break;
         }
@@ -161,6 +161,14 @@ public class TailFile {
     Event event = EventBuilder.withBody(StringUtils.removeEnd(line, lineSep), Charsets.UTF_8);
     if (addByteOffset == true) {
       event.getHeaders().put(BYTE_OFFSET_HEADER_KEY, posTmp.toString());
+    }
+    return event;
+  }
+
+  private Event readEvent(boolean backoffWithoutNL, boolean addByteOffset, boolean addInode) throws IOException {
+    Event event = readEvent(backoffWithoutNL, addByteOffset);
+    if(null != event && addInode == true) {
+      event.getHeaders().put(INODE_HEADER_KEY, inode+"");
     }
     return event;
   }

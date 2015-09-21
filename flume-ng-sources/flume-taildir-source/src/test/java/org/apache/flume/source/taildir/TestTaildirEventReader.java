@@ -67,7 +67,7 @@ public class TestTaildirEventReader {
   }
 
   private ReliableTaildirEventReader getReader(Map<String, String> filePaths,
-      Table<String, String, String> headerTable, boolean addByteOffset) {
+      Table<String, String, String> headerTable, boolean addByteOffset, boolean inode) {
     ReliableTaildirEventReader reader;
     try {
       reader = new ReliableTaildirEventReader.Builder()
@@ -76,6 +76,7 @@ public class TestTaildirEventReader {
           .positionFilePath(posFilePath)
           .skipToEnd(false)
           .addByteOffset(addByteOffset)
+          .addInode(inode)
           .build();
       reader.updateTailFiles();
     } catch (IOException ioe) {
@@ -84,14 +85,14 @@ public class TestTaildirEventReader {
     return reader;
   }
 
-  private ReliableTaildirEventReader getReader(boolean addByteOffset) {
+  private ReliableTaildirEventReader getReader(boolean addByteOffset, boolean inode) {
     Map<String, String> filePaths = ImmutableMap.of("testFiles", tmpDir.getAbsolutePath() + "/file.*");
     Table<String, String, String> headerTable = HashBasedTable.create();
-    return getReader(filePaths, headerTable, addByteOffset);
+    return getReader(filePaths, headerTable, addByteOffset, inode);
   }
 
   private ReliableTaildirEventReader getReader() {
-    return getReader(false);
+    return getReader(false, false);
   }
 
   @Before
@@ -124,7 +125,7 @@ public class TestTaildirEventReader {
     Files.write("file2line1\nfile2line2\n", f2, Charsets.UTF_8);
     Files.write("file3line1\nfile3line2\n", f3, Charsets.UTF_8);
 
-    ReliableTaildirEventReader reader = getReader();
+    ReliableTaildirEventReader reader = getReader(true, true);
     List<String> out = Lists.newArrayList();
     for (TailFile tf : reader.getTailFiles().values()) {
       List<String> bodies = bodiesAsStrings(reader.readEvents(tf, 2));
@@ -474,7 +475,7 @@ public class TestTaildirEventReader {
     String line3 = "file1line3\n";
     Files.write(line1 + line2 + line3, f1, Charsets.UTF_8);
 
-    ReliableTaildirEventReader reader = getReader(true);
+    ReliableTaildirEventReader reader = getReader(true, false);
     List<String> headers = null;
     for (TailFile tf : reader.getTailFiles().values()) {
       headers = headersAsStrings(reader.readEvents(tf, 5), BYTE_OFFSET_HEADER_KEY);

@@ -64,6 +64,7 @@ public class TaildirSource extends AbstractSource implements
   private String positionFilePath;
   private boolean skipToEnd;
   private boolean byteOffsetHeader;
+  private boolean inodeHeader;
 
   private SourceCounter sourceCounter;
   private ReliableTaildirEventReader reader;
@@ -92,6 +93,7 @@ public class TaildirSource extends AbstractSource implements
           .positionFilePath(positionFilePath)
           .skipToEnd(skipToEnd)
           .addByteOffset(byteOffsetHeader)
+          .addInode(inodeHeader)
           .build();
     } catch (IOException e) {
       throw new FlumeException("Error instantiating ReliableTaildirEventReader", e);
@@ -137,8 +139,8 @@ public class TaildirSource extends AbstractSource implements
   @Override
   public String toString() {
     return String.format("Taildir source: { positionFile: %s, skipToEnd: %s, "
-        + "byteOffsetHeader: %s, idleTimeout: %s, writePosInterval: %s }",
-        positionFilePath, skipToEnd, byteOffsetHeader, idleTimeout, writePosInterval);
+        + "byteOffsetHeader: %s, inodeHeader: %s, idleTimeout: %s, writePosInterval: %s }",
+        positionFilePath, skipToEnd, byteOffsetHeader, inodeHeader, idleTimeout, writePosInterval);
   }
 
   @Override
@@ -156,6 +158,7 @@ public class TaildirSource extends AbstractSource implements
     batchSize = context.getInteger(BATCH_SIZE, DEFAULT_BATCH_SIZE);
     skipToEnd = context.getBoolean(SKIP_TO_END, DEFAULT_SKIP_TO_END);
     byteOffsetHeader = context.getBoolean(BYTE_OFFSET_HEADER, DEFAULT_BYTE_OFFSET_HEADER);
+    inodeHeader = context.getBoolean(INODE_HEADER, DEFAULT_INODE_HEADER);
     idleTimeout = context.getInteger(IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT);
     writePosInterval = context.getInteger(WRITE_POS_INTERVAL, DEFAULT_WRITE_POS_INTERVAL);
 

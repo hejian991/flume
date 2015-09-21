@@ -54,4 +54,10 @@ public class TaildirSourceConfigurationConstants {
 
   /** public static final */
   public static final Pattern emptyLinePattern = Pattern.compile("\\s+");
+
+
+  public static final String INODE_HEADER = "inodeHeader";
+  public static final String INODE_HEADER_KEY = "inode";
+  public static final boolean DEFAULT_INODE_HEADER = false;
+
 }

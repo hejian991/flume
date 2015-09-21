@@ -62,6 +62,7 @@ public class ReliableTaildirEventReader implements ReliableEventReader {
   private Map<Long, TailFile> tailFiles = Maps.newHashMap();
   private long updateTime;
   private boolean addByteOffset;
+  private boolean addInode;
   private boolean committed = true;
 
   /**
@@ -69,7 +70,7 @@ public class ReliableTaildirEventReader implements ReliableEventReader {
    */
   private ReliableTaildirEventReader(Map<String, String> filePaths,
       Table<String, String, String> headerTable, String positionFilePath,
-      boolean skipToEnd, boolean addByteOffset) throws IOException {
+      boolean skipToEnd, boolean addByteOffset, boolean addInode) throws IOException {
     // Sanity checks
     Preconditions.checkNotNull(filePaths);
     Preconditions.checkNotNull(positionFilePath);
@@ -94,6 +95,7 @@ public class ReliableTaildirEventReader implements ReliableEventReader {
     this.tailFileTable = tailFileTable;
     this.headerTable = headerTable;
     this.addByteOffset = addByteOffset;
+    this.addInode = addInode;
     updateTailFiles(skipToEnd);
 
     logger.info("Updating position from position file: " + positionFilePath);
@@ -199,7 +201,7 @@ public class ReliableTaildirEventReader implements ReliableEventReader {
       long lastPos = currentFile.getPos();
       currentFile.getRaf().seek(lastPos);
     }
-    List<Event> events = currentFile.readEvents(numEvents, backoffWithoutNL, addByteOffset);
+    List<Event> events = currentFile.readEvents(numEvents, backoffWithoutNL, addByteOffset, addInode);
     if (events.isEmpty()) {
       return events;
     }
@@ -316,6 +318,7 @@ public class ReliableTaildirEventReader implements ReliableEventReader {
     private String positionFilePath;
     private boolean skipToEnd;
     private boolean addByteOffset;
+    private boolean addInode;
 
     public Builder filePaths(Map<String, String> filePaths) {
       this.filePaths = filePaths;
@@ -342,8 +345,13 @@ public class ReliableTaildirEventReader implements ReliableEventReader {
       return this;
     }
 
+    public Builder addInode(boolean addInode) {
+      this.addInode = addInode;
+      return this;
+    }
+
     public ReliableTaildirEventReader build() throws IOException {
-      return new ReliableTaildirEventReader(filePaths, headerTable, positionFilePath, skipToEnd, addByteOffset);
+      return new ReliableTaildirEventReader(filePaths, headerTable, positionFilePath, skipToEnd, addByteOffset, addInode);
     }
   }
 
