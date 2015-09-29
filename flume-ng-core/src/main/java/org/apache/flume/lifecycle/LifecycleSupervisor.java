@@ -165,8 +165,8 @@ public class LifecycleSupervisor implements LifecycleAware {
     logger.debug("Unsupervising service:{}", lifecycleAware);
 
     synchronized (lifecycleAware) {
-    Supervisoree supervisoree = supervisedProcesses.get(lifecycleAware);
-    supervisoree.status.discard = true;
+      Supervisoree supervisoree = supervisedProcesses.get(lifecycleAware);
+      supervisoree.status.discard = true;
       this.setDesiredState(lifecycleAware, LifecycleState.STOP);
       logger.info("Stopping component: {}", lifecycleAware);
       lifecycleAware.stop();

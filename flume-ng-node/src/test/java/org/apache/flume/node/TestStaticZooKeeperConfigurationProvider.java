@@ -29,7 +29,7 @@ public class TestStaticZooKeeperConfigurationProvider extends
   protected void doSetUp() throws Exception {
     addData();
     configurationProvider = new StaticZooKeeperConfigurationProvider(
-        AGENT_NAME, "localhost:" + zkServer.getPort(), null);
+        AGENT_NAME, "nj02-lbs-impala2.nj02.baidu.com:8181", null); //"localhost:" + zkServer.getPort(), null);
   }
 
   @Override

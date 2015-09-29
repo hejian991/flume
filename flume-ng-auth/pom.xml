@@ -73,12 +73,12 @@ limitations under the License.
       <artifactId>flume-ng-sdk</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-minikdc</artifactId>
-      <version>${hadoop2.version}</version>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.apache.hadoop</groupId>-->
+      <!--<artifactId>hadoop-minikdc</artifactId>-->
+      <!--<version>${hadoop2.version}</version>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>com.google.guava</groupId>
