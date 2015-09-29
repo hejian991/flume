@@ -16,7 +16,7 @@ Z=$3
 let "ZN=$Z+1"
 
 
-git branch -d waimai-branch-$X.$Y.$Z
+git branch -D waimai-branch-$X.$Y.$Z
 
 git tag -d waimai-tag-$X.$Y.$Z
 git push origin :refs/tags/waimai-tag-$X.$Y.$Z
