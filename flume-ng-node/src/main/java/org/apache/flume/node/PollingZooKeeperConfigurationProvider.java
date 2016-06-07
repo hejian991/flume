@@ -18,8 +18,7 @@
 
 package org.apache.flume.node;
 
-import java.io.IOException;
-
+import com.google.common.eventbus.EventBus;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.NodeCache;
@@ -31,7 +30,7 @@ import org.apache.flume.lifecycle.LifecycleState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.eventbus.EventBus;
+import java.io.IOException;
 
 public class PollingZooKeeperConfigurationProvider extends
     AbstractZooKeeperConfigurationProvider implements LifecycleAware {
@@ -48,6 +47,7 @@ public class PollingZooKeeperConfigurationProvider extends
   private FlumeConfiguration flumeConfiguration;
 
   private LifecycleState lifecycleState;
+  private String confData="";
 
   public PollingZooKeeperConfigurationProvider(String agentName,
       String zkConnString, String basePath, EventBus eventBus) {
@@ -100,6 +100,16 @@ public class PollingZooKeeperConfigurationProvider extends
     if (childData != null) {
       data = childData.getData();
     }
+
+    String confDataNow = new String(data != null ? data : new byte[0]);
+    if(confDataNow.equalsIgnoreCase(confData)) {
+      LOGGER.info("ZooKeeper confData is same with confData, return.");
+      return;
+    }
+
+    this.confData = confDataNow;
+
+    LOGGER.warn("After refreshing config, confDataNow is [" + confDataNow + "]");
     flumeConfiguration = configFromBytes(data);
     eventBus.post(getConfiguration());
   }
